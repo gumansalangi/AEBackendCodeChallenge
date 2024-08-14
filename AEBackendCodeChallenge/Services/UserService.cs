@@ -72,7 +72,7 @@ namespace AEBackendCodeChallenge.Services
 
 
 
-        public async Task<User> UpdateUserShipsAsync(int userId, string shipIds)
+        public async Task<User> UpdateUserShipsAsync(int? userId, string shipIds)
         {
             try
             {

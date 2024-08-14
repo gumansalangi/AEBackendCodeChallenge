@@ -2,8 +2,10 @@
 {
     public class UpdateUserQuery
     {
-        public int UsersId { get; set; }
-        public string? ShipdId { get; set; }
+        public int? UsersId { get; set; }
+        public string? ShipId { get; set; }
+        public string UserName { get; set; }
+        public string UserRole { get; set; }
 
     }
 }

@@ -76,15 +76,17 @@ namespace AEBackendCodeChallenge.Test.TestController
             var updateUserQuery = new UpdateUserQuery
             {
                 UsersId = user.Id,
-                ShipdId = "RGSL002"
+                ShipId = "RGSL002"
             };
 
             var result = await _usersController.UpdateUserShips(updateUserQuery);
 
             //Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnValue = Assert.IsType<User>(okResult.Value);
-            Assert.Equal(user.Id, returnValue.Id);
+            var returnValue = Assert.IsType<UpdateUserQuery>(okResult.Value);
+            Assert.Equal(user.Id, returnValue.UsersId);
+            Assert.Equal(user.Name, returnValue.UserName);
+
 
         }
     }

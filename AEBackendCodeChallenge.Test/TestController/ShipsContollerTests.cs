@@ -87,7 +87,7 @@ namespace AEBackendCodeChallenge.Test.TestController
         public async Task UpdateVelocity_Returns_OkResult_With_UpdatedShips()
         {
             //Arrange
-            var ships = new Ship { Id = 1, ShipId = "RGSL001", Name = "TestNameUpdateVelocityShip1", Velocity = 13 };
+            var ships = new Ship { Id = 1, ShipId = "RGSL001", Name = "TestNameUpdateVelocityShip1", Velocity = 28 };
             _mockShipService.Setup(s=> s.UpdateShipVelocityAsync(ships.ShipId, It.IsAny<double>()))
                 .ReturnsAsync(ships);
 

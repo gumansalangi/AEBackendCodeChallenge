@@ -69,17 +69,27 @@ namespace AEBackendCodeChallenge.Controllers
                 if (updateUserQuery == null)
                     return BadRequest("User Id and Ship IDs are null or empty");
 
-                var updatedUser = await _userService.UpdateUserShipsAsync(updateUserQuery.UsersId, updateUserQuery.ShipdId);
+                var updatedUser = await _userService.UpdateUserShipsAsync(updateUserQuery.UsersId, updateUserQuery.ShipId);
                 if (updatedUser == null)
                     return NotFound($"User with ID " + updateUserQuery.UsersId + " not found or ships could not be updated");
 
-                return Ok(new
+                UpdateUserQuery returnValue = new UpdateUserQuery();
+                if (updatedUser.Ships == null)
                 {
-                    Name = updatedUser.Name,
-                    Role = updatedUser.Role,
-                    ShipId = updatedUser.Ships.FirstOrDefault().ShipId,
-                    CurrentShipUserID = updatedUser.Ships.FirstOrDefault().UserId
-                });
+                    returnValue.UsersId = updatedUser.Id;
+                    returnValue.ShipId = null;
+                    returnValue.UserName = updatedUser.Name;
+                    returnValue.UserRole = updatedUser.Role;
+                }
+                else
+                {
+                    returnValue.UsersId= updatedUser.Ships.FirstOrDefault().UserId;
+                    returnValue.ShipId = updatedUser.Ships.FirstOrDefault().ShipId;
+                    returnValue.UserName = updatedUser.Name;
+                    returnValue.UserRole = updatedUser.Role;
+                }
+
+                return Ok(returnValue);
             }
             catch (Exception ex)
             {

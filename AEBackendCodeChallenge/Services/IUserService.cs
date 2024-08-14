@@ -7,6 +7,6 @@ namespace AEBackendCodeChallenge.Services
         Task<List<User>> GetAllUsersAsync();
         Task<User> GetUserByIdAsync(int id);
         Task<User> AddUserAsync(User user);
-        Task<User> UpdateUserShipsAsync(int userId, string shipIds);
+        Task<User> UpdateUserShipsAsync(int? userId, string shipIds);
     }
 }
