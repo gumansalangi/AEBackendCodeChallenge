@@ -1,16 +1,18 @@
 ﻿using AEBackendCodeChallenge.Models;
+using AEBackendCodeChallenge.Models.Dto;
 
 namespace AEBackendCodeChallenge.Services
 {
     public interface IShipService
     {
-        Task<List<Ship>> GetAllShipsAsync();
-        Task<List<Ship>> GetUnassignedShipsAsync();
-        Task<List<Ship>> GetShipsByUserIdAsync(int id);
+        Task<List<ShipWithUsersDto>> GetAllShipsAsync();
+        Task<List<ShipWithUsersDto>> GetUnassignedShipsAsync();
+        Task<IEnumerable<ShipWithUsersDto>> GetShipsByUserIdAsync(int id);
         Task<Ship> GetShipByIdAsync(int id);
-        Task<Ship> AddShipAsync(Ship ship);
-        Task<Ship> UpdateShipVelocityAsync(string shipId, double velocity);
-        Task<(Ship ship, Port closestPort, string estimatedArrivalTime)> GetClosestPortAsync(string shipId);
+        Task<ShipWithUsersDto> AddShipAsync(AddShipDto ship);
+        Task<ShipWithUsersDto> UpdateShipVelocityAsync(int shipId, double velocity);
+        Task<ShipClosestPortDto> GetClosestPortAsync(GetClosestPortDto getClosestPortDto);
+        Task<ShipWithUsersDto> AssignShipToUserAsync(AssignUserToShipDto assignUserToShipDto);
 
     }
 }

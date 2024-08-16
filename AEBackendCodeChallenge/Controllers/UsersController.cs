@@ -1,5 +1,5 @@
 ﻿using AEBackendCodeChallenge.Models;
-using AEBackendCodeChallenge.Models.Queryable;
+using AEBackendCodeChallenge.Models.Dto;
 using AEBackendCodeChallenge.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +20,7 @@ namespace AEBackendCodeChallenge.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<User>>> GetUsers()
+        public async Task<ActionResult<List<UserWithShipsDto>>> GetUsers()
         {
             try
             {
@@ -35,7 +35,7 @@ namespace AEBackendCodeChallenge.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(User user)
+        public async Task<ActionResult<UserWithShipsDto>> CreateUser(AddUserDto user)
         {
             if (!ModelState.IsValid)
             {
@@ -52,48 +52,32 @@ namespace AEBackendCodeChallenge.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError, "User could not be created");
 
                 //user successfully created
-                return CreatedAtAction(nameof(GetUsers), new { id = createdUser.Id }, createdUser);
+                return CreatedAtAction(nameof(GetUsers), new { id = createdUser.UserId }, createdUser);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating a user.");
-                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString() + " Internal server error");
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> UpdateUserShips(UpdateUserQuery updateUserQuery)
+        public async Task<ActionResult<UserWithShipsDto>> AssignUserToShips(AssignShipToUserDto assignShipToUser)
         {
             try
             {
-                if (updateUserQuery == null)
+                if (assignShipToUser == null)
                     return BadRequest("User Id and Ship IDs are null or empty");
 
-                var updatedUser = await _userService.UpdateUserShipsAsync(updateUserQuery.UsersId, updateUserQuery.ShipId);
+                var updatedUser = await _userService.UpdateUserShipsAsync(assignShipToUser);
                 if (updatedUser == null)
-                    return NotFound($"User with ID " + updateUserQuery.UsersId + " not found or ships could not be updated");
+                    return NotFound($"User with ID " + assignShipToUser.UsersId + " not found or ships could not be updated");
 
-                UpdateUserQuery returnValue = new UpdateUserQuery();
-                if (updatedUser.Ships == null)
-                {
-                    returnValue.UsersId = updatedUser.Id;
-                    returnValue.ShipId = null;
-                    returnValue.UserName = updatedUser.Name;
-                    returnValue.UserRole = updatedUser.Role;
-                }
-                else
-                {
-                    returnValue.UsersId= updatedUser.Ships.FirstOrDefault().UserId;
-                    returnValue.ShipId = updatedUser.Ships.FirstOrDefault().ShipId;
-                    returnValue.UserName = updatedUser.Name;
-                    returnValue.UserRole = updatedUser.Role;
-                }
-
-                return Ok(returnValue);
+                return Ok(updatedUser);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An error occurred while updating ships for user ID " + updateUserQuery.UsersId + ".");
+                _logger.LogError(ex, $"An error occurred while updating ships for user ID " + assignShipToUser.UsersId + ".");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }

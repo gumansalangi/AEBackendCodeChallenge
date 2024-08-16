@@ -1,5 +1,5 @@
 ﻿using AEBackendCodeChallenge.Models;
-using AEBackendCodeChallenge.Models.Queryable;
+using AEBackendCodeChallenge.Models.Dto;
 
 namespace AEBackendCodeChallenge.Services
 {
@@ -7,6 +7,6 @@ namespace AEBackendCodeChallenge.Services
     {
         Task<List<Port>> GetAllPortsAsync();
         Task<Port> AddPortAsync(Port port);
-        Task<Port> UpdatePortAsync(UpdatePortQuery updatedPort);
+        Task<Port> UpdatePortAsync(PortDto updatedPort);
     }
 }

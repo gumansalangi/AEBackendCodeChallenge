@@ -1,6 +1,6 @@
 ﻿using AEBackendCodeChallenge.Controllers;
 using AEBackendCodeChallenge.Models;
-using AEBackendCodeChallenge.Models.Queryable;
+using AEBackendCodeChallenge.Models.Dto;
 using AEBackendCodeChallenge.Services;
 using Castle.Core.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -32,10 +32,10 @@ namespace AEBackendCodeChallenge.Test.TestController
         public async Task GetAllUsers_Returns_OKResult_With_ListOfUsers()
         {
             //Arrange
-            var user = new List<User>
+            var user = new List<UserWithShipsDto>
             {
-                new User { Id = 1, Name = "TestName1" },
-                new User { Id = 2, Name = "TestName2" }
+                new UserWithShipsDto { UserId = 1, UserName = "TestName1" },
+                new UserWithShipsDto { UserId = 2, UserName = "TestName2" }
             };
             //test the user service to load all user
             _mockUserService.Setup(s => s.GetAllUsersAsync()).ReturnsAsync(user);
@@ -53,41 +53,45 @@ namespace AEBackendCodeChallenge.Test.TestController
         public async Task CreateUser_Returns_CreatedResult_With_NewUser()
         {
             //Arrange
-            var user = new User { Id = 1, Name = "TestNameAddUSer" };
-            _mockUserService.Setup(s=> s.AddUserAsync(It.IsAny<User>())).ReturnsAsync(user);
-
+            var user = new UserWithShipsDto { UserId = 1, UserName = "TestNameAddUSer", Role = "Admin", Ships = [] };
+            _mockUserService.Setup(s=> s.AddUserAsync(It.IsAny<AddUserDto>())).ReturnsAsync(user);
+            
             //Act
-            var result = await _usersController.CreateUser(user);
+            var userDto = new AddUserDto { UserId = 1, UserName = "TestNameAddUSer", Role = "Admin", Ships = [] };
+            var result = await _usersController.CreateUser(userDto);
 
             //Assert
             var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result.Result);
             var returnValue = Assert.IsType<User>(createdAtActionResult.Value);
-            Assert.Equal(user.Id, returnValue.Id);
+            Assert.Equal(user.UserId, returnValue.Id);
         }
 
         [Fact]
         public async Task UpdateUserShips_Returns_OKResult_With_UpdatedUsers()
         {
             //Arrange
+            AssignShipToUserDto assignShipToUser = new AssignShipToUserDto();
+            assignShipToUser.UsersId = 1;
+            assignShipToUser.ShipIds = new List<int> { 1,2 };
+
             var user = new User { Id = 1, Name = "TestUpdateName1" };
-            _mockUserService.Setup(s=>s.UpdateUserShipsAsync(user.Id, "RGSL002")).ReturnsAsync(user);
+            var returnUserWithDto = new UserWithShipsDto();
+            _mockUserService.Setup(s=>s.UpdateUserShipsAsync(assignShipToUser)).ReturnsAsync(returnUserWithDto);
 
             //Act
-            var updateUserQuery = new UpdateUserQuery
-            {
-                UsersId = user.Id,
-                ShipId = "RGSL002"
-            };
+            AssignShipToUserDto assignShipToUserAct = new AssignShipToUserDto();
+            assignShipToUserAct.UsersId = 1;
+            assignShipToUserAct.ShipIds = new List<int> { 1, 2 };
 
-            var result = await _usersController.UpdateUserShips(updateUserQuery);
+
+
+            var result = await _usersController.AssignUserToShips(assignShipToUserAct);
 
             //Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnValue = Assert.IsType<UpdateUserQuery>(okResult.Value);
-            Assert.Equal(user.Id, returnValue.UsersId);
+            var returnValue = Assert.IsType<UserWithShipsDto>(okResult.Value);
+            Assert.Equal(user.Id, returnValue.UserId);
             Assert.Equal(user.Name, returnValue.UserName);
-
-
         }
     }
 }

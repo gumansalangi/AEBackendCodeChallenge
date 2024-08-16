@@ -1,12 +1,13 @@
 ﻿using AEBackendCodeChallenge.Models;
+using AEBackendCodeChallenge.Models.Dto;
 
 namespace AEBackendCodeChallenge.Services
 {
     public interface IUserService
     {
-        Task<List<User>> GetAllUsersAsync();
-        Task<User> GetUserByIdAsync(int id);
-        Task<User> AddUserAsync(User user);
-        Task<User> UpdateUserShipsAsync(int? userId, string shipIds);
+        Task<List<UserWithShipsDto>> GetAllUsersAsync();
+        Task<UserWithShipsDto> GetUserByIdAsync(int id);
+        Task<UserWithShipsDto> AddUserAsync(AddUserDto user);
+        Task<UserWithShipsDto> UpdateUserShipsAsync(AssignShipToUserDto assignShipToUser);
     }
 }

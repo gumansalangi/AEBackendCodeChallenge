@@ -1,5 +1,5 @@
 ﻿using AEBackendCodeChallenge.Models;
-using AEBackendCodeChallenge.Models.Queryable;
+using AEBackendCodeChallenge.Models.Dto;
 using AEBackendCodeChallenge.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +21,7 @@ namespace AEBackendCodeChallenge.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Ship>>> GetShips()
+        public async Task<ActionResult<List<ShipWithUsersDto>>> GetShips()
         {
             try
             {
@@ -36,7 +36,7 @@ namespace AEBackendCodeChallenge.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Ship>>> GetUnassignedShips()
+        public async Task<ActionResult<List<ShipWithUsersDto>>> GetUnassignedShips()
         {
             try
             {
@@ -52,7 +52,7 @@ namespace AEBackendCodeChallenge.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Ship>>> GetShipsBasedOnUserID(int id)
+        public async Task<ActionResult<List<ShipWithUsersDto>>> GetShipsBasedOnUserID(int id)
         {
             try
             {
@@ -68,7 +68,30 @@ namespace AEBackendCodeChallenge.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Ship>> CreateShip(Ship ship)
+        public async Task<ActionResult<ShipWithUsersDto>> AssignShipToUser(AssignUserToShipDto assignUserToShipDto)
+        {
+
+            try
+            {
+                if (assignUserToShipDto == null)
+                    return BadRequest("User Id and Ship IDs are null or empty");
+
+                var updatedUser = await _shipService.AssignShipToUserAsync(assignUserToShipDto);
+                if (updatedUser == null)
+                    return NotFound($"User with ID " + assignUserToShipDto.ShipId + " not found or ships could not be updated");
+
+                return Ok(updatedUser);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while updating ships for user ID " + assignUserToShipDto.ShipId + ".");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<ActionResult<ShipWithUsersDto>> CreateShip(AddShipDto ship)
         {
             if (!ModelState.IsValid)
             {
@@ -86,7 +109,7 @@ namespace AEBackendCodeChallenge.Controllers
 
                 return CreatedAtAction(nameof(GetShips), new
                 {
-                    id = createdShip.Id
+                    id = createdShip.ShipId
                 }, createdShip);
             }
             catch (Exception ex)
@@ -97,7 +120,7 @@ namespace AEBackendCodeChallenge.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Ship>> UpdateVelocity(UpdateVelocityQuery updateVelocityQuery)
+        public async Task<ActionResult<ShipWithUsersDto>> UpdateVelocity(UpdateShipVelocityDto updateVelocityQuery)
         {
             try
             {
@@ -105,7 +128,7 @@ namespace AEBackendCodeChallenge.Controllers
                     return BadRequest("Velocity must be greater than zero");
 
                 var updatedShip = await _shipService.UpdateShipVelocityAsync(updateVelocityQuery.ShipId, updateVelocityQuery.Velocity);
-                if (updatedShip == null)    
+                if (updatedShip == null)
                     return NotFound("Ship with ID {id} not found or velocity could not be updated");
 
                 return Ok(updatedShip);
@@ -118,24 +141,19 @@ namespace AEBackendCodeChallenge.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<object>> GetClosestPort(string shipId)
+        public async Task<ActionResult<ShipClosestPortDto>> GetClosestPort(GetClosestPortDto getClosestPort)
         {
             try
             {
-                var result = await _shipService.GetClosestPortAsync(shipId);
-                if (result.closestPort == null)
-                    return NotFound("Ship with ID " + shipId + " not found or no closest port could be determined");
+                var result = await _shipService.GetClosestPortAsync(getClosestPort);
+                if (result.PortInformation == null)
+                    return NotFound("Ship with ID " + getClosestPort.id + " not found or no closest port could be determined");
 
-                return Ok(new 
-                {
-                    ShipInfo    = result.ship, 
-                    ClosestPort = result.closestPort,
-                    EstimatedArrivalTime = result.estimatedArrivalTime,
-                });
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An error occurred while calculating the closest port for ship ID {shipId}.");
+                _logger.LogError(ex, $"An error occurred while calculating the closest port for ship ID "+ getClosestPort.id+".");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }

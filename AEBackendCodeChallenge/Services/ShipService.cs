@@ -1,6 +1,8 @@
 ﻿using AEBackendCodeChallenge.Data;
 using AEBackendCodeChallenge.Models;
+using AEBackendCodeChallenge.Models.Dto;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace AEBackendCodeChallenge.Services
 {
@@ -15,37 +17,164 @@ namespace AEBackendCodeChallenge.Services
             _logger = logger;
         }
 
-        public async Task<List<Ship>> GetAllShipsAsync()
+        public async Task<List<ShipWithUsersDto>> GetAllShipsAsync()
         {
             try
             {
-                return await _context.Ships.Include(s => s.User).ToListAsync();
+                //Load all ship with or without user assign to the ship
+                var shipsWithUsers = await _context.Ships
+                    .Select(ship => new ShipWithUsersDto
+                    {
+                        ShipId = ship.Id,
+                        Name = ship.Name,
+                        ShipCode = ship.ShipCode,
+                        Latitude = ship.Latitude,
+                        Longitude = ship.Longitude,
+                        Velocity = ship.Velocity,
+                        Users = ship.UserShips
+                                .Select(su => new UserDto
+                                {
+                                    UserId = su.UserId,
+                                    UserName = su.User.Name,
+                                    Role = su.User.Role
+                                })
+                                .ToList()
+                    }).ToListAsync();
+
+                return shipsWithUsers;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching all ships.");
-                return new List<Ship>(); // or throw a custom exception
+                return null; // or throw a custom exception
             }
         }
 
-        public async Task<List<Ship>> GetUnassignedShipsAsync()
+        public async Task<List<ShipWithUsersDto>> GetUnassignedShipsAsync()
         {
+
             try
             {
-                return await _context.Ships.Where(s => s.UserId == null).ToListAsync();
+                //Load all ship with or without user assign to the ship
+                var shipsWithUsers = await _context.Ships
+                    .Select(ship => new ShipWithUsersDto
+                    {
+                        ShipId = ship.Id,
+                        Name = ship.Name,
+                        ShipCode = ship.ShipCode,
+                        Latitude = ship.Latitude,
+                        Longitude = ship.Longitude,
+                        Velocity = ship.Velocity,
+                        Users = ship.UserShips
+                                .Select(su => new UserDto
+                                {
+                                    UserId = su.UserId,
+                                    UserName = su.User.Name,
+                                    Role = su.User.Role
+                                })
+                                .ToList()
+                    })
+                    .Where(w => w.Users.Count <= 0)
+                    .ToListAsync();
+
+                return shipsWithUsers;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while fetching unassigned ships.");
-                return new List<Ship>(); // or throw a custom exception
+                _logger.LogError(ex, "An error occurred while fetching all ships.");
+                return null; // or throw a custom exception
             }
         }
 
-        public async Task<List<Ship>> GetShipsByUserIdAsync(int id)
+        public async Task<ShipWithUsersDto> AssignShipToUserAsync(AssignUserToShipDto assignUserToShipDto)
+        {
+            //check from UserShip if not found then insert, if found do delete insert.
+            var checkShipsUsers = await _context.UserShips.Where(u => u.ShipId == assignUserToShipDto.ShipId)
+                .ToListAsync();
+
+            if (checkShipsUsers.Count > 0)
+            {
+                //do remove based on shipid
+                _context.UserShips.RemoveRange(checkShipsUsers);
+            }
+
+            //do insert
+            foreach (var uId in assignUserToShipDto.UserIds)
+            {
+                UserShip userShipsData = new UserShip();
+                userShipsData.ShipId = assignUserToShipDto.ShipId;
+                userShipsData.UserId = uId;
+                _context.UserShips.Add(userShipsData);
+            }
+            await _context.SaveChangesAsync();
+
+            //Load all Ship with or without user for return value
+            //Load all ship with or without user assign to the ship
+            var shipsWithUsers = await _context.Ships
+                .Select(ship => new ShipWithUsersDto
+                {
+                    ShipId = ship.Id,
+                    Name = ship.Name,
+                    ShipCode = ship.ShipCode,
+                    Latitude = ship.Latitude,
+                    Longitude = ship.Longitude,
+                    Velocity = ship.Velocity,
+                    Users = ship.UserShips
+                            .Select(su => new UserDto
+                            {
+                                UserId = su.UserId,
+                                UserName = su.User.Name,
+                                Role = su.User.Role
+                            })
+                            .ToList()
+                })
+                .Where(w => w.ShipId == assignUserToShipDto.ShipId)
+                .FirstOrDefaultAsync();
+
+            return shipsWithUsers;
+        }
+
+        public async Task<IEnumerable<ShipWithUsersDto>> GetShipsByUserIdAsync(int userId)
         {
             try
             {
-                var ship = await _context.Ships.Where(s => s.UserId == id).ToListAsync();
+                //Load all ship with or without user assign to the ship
+                var shipsWithUsers = await _context.Ships
+                    .Select(ship => new ShipWithUsersDto
+                    {
+                        ShipId = ship.Id,
+                        Name = ship.Name,
+                        ShipCode = ship.ShipCode,
+                        Latitude = ship.Latitude,
+                        Longitude = ship.Longitude,
+                        Velocity = ship.Velocity,
+                        Users = ship.UserShips
+                                .Select(su => new UserDto
+                                {
+                                    UserId = su.UserId,
+                                    UserName = su.User.Name,
+                                    Role = su.User.Role
+                                })
+                                .Where(u => u.UserId == userId)
+                                .ToList()
+                    })
+                    .Where(w => w.Users.Count > 0)
+                    .ToListAsync();
+
+                return shipsWithUsers;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching all ships.");
+                return null; // or throw a custom exception
+            }
+        }
+
+        public async Task<Ship> GetShipByIdAsync(int id)
+        {
+            try
+            {
+                var ship = await _context.Ships.FirstOrDefaultAsync(s => s.Id == id);
                 if (ship == null)
                 {
                     _logger.LogWarning($"Ship with ID " + id + " was not found.");
@@ -60,34 +189,63 @@ namespace AEBackendCodeChallenge.Services
             }
         }
 
-
-        public async Task<Ship> GetShipByIdAsync(int id)
+        public async Task<ShipWithUsersDto> AddShipAsync(AddShipDto ship)
         {
             try
             {
-                var ship = await  _context.Ships.FirstOrDefaultAsync(s => s.Id == id);
-                if (ship == null)
+                var shipUsers = new List<UserShip>();
+
+                Ship newShip = new Ship
                 {
-                    _logger.LogWarning($"Ship with ID "+ id + " was not found.");
-                    return null;
-                }
-                return ship;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"An error occurred while fetching the ship with ID {id}.");
-                return null; // or throw a custom exception
-            }
-        }
+                    Name = ship.Name,
+                    ShipCode = ship.ShipCode,
+                    Latitude = ship.Latitude,
+                    Longitude = ship.Longitude,
+                    Velocity = ship.Velocity
+                };
 
-
-        public async Task<Ship> AddShipAsync(Ship ship)
-        {
-            try
-            {
-                _context.Ships.Add(ship);
+                _context.Ships.Add(newShip);
                 await _context.SaveChangesAsync();
-                return ship;
+
+                //IF the list of user is present from the input then continue to add the usership table
+                if (ship.Users.Count > 0)
+                {
+                    foreach (var us in ship.Users)
+                    {
+                        UserShip uss = new UserShip();
+                        uss.ShipId = newShip.Id;
+                        uss.UserId = us.UserId;
+                        _context.UserShips.Add(uss);
+                    }
+                }
+
+
+                await _context.SaveChangesAsync();
+
+
+                //reload created ship for return value
+                var shipsWithUsers = await _context.Ships
+                    .Select(ship => new ShipWithUsersDto
+                    {
+                        ShipId = ship.Id,
+                        Name = ship.Name,
+                        ShipCode = ship.ShipCode,
+                        Latitude = ship.Latitude,
+                        Longitude = ship.Longitude,
+                        Velocity = ship.Velocity,
+                        Users = ship.UserShips
+                                .Select(su => new UserDto
+                                {
+                                    UserId = su.UserId,
+                                    UserName = su.User.Name,
+                                    Role = su.User.Role
+                                })
+                                .ToList()
+                    })
+                    .Where(w => w.ShipId == newShip.Id)
+                    .FirstOrDefaultAsync();
+
+                return shipsWithUsers;
             }
             catch (Exception ex)
             {
@@ -97,12 +255,12 @@ namespace AEBackendCodeChallenge.Services
         }
 
 
-        public async Task<Ship> UpdateShipVelocityAsync(string shipId, double velocity)
+        public async Task<ShipWithUsersDto> UpdateShipVelocityAsync(int shipId, double velocity)
         {
             try
             {
                 var ship = await _context.Ships
-                    .FirstOrDefaultAsync(s => s.ShipId == shipId);
+                    .FirstOrDefaultAsync(s => s.Id == shipId);
                 if (ship == null)
                 {
                     _logger.LogWarning($"Ship with ID {shipId} was not found.");
@@ -111,31 +269,73 @@ namespace AEBackendCodeChallenge.Services
 
                 ship.Velocity = velocity;
                 await _context.SaveChangesAsync();
-                return ship;
+
+                //Load all ship with or without user assign to the ship
+                var shipsWithUsers = await _context.Ships
+                    .Select(ship => new ShipWithUsersDto
+                    {
+                        ShipId = ship.Id,
+                        Name = ship.Name,
+                        ShipCode = ship.ShipCode,
+                        Latitude = ship.Latitude,
+                        Longitude = ship.Longitude,
+                        Velocity = ship.Velocity,
+                        Users = ship.UserShips
+                                .Select(su => new UserDto
+                                {
+                                    UserId = su.UserId,
+                                    UserName = su.User.Name,
+                                    Role = su.User.Role
+                                })
+                                .ToList()
+                    })
+                    .Where(w => w.ShipId == shipId)
+                    .FirstOrDefaultAsync();
+
+                return shipsWithUsers;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An error occurred while updating the velocity of ship ID {shipId}.");
+                _logger.LogError(ex, $"An error occurred while updating the velocity of ship ID " + shipId + ".");
                 return null; // or throw a custom exception
             }
         }
 
-        public async Task<(Ship ship, Port closestPort, string estimatedArrivalTime)> GetClosestPortAsync(string shipId)
+        public async Task<ShipClosestPortDto> GetClosestPortAsync(GetClosestPortDto getClosestPort)
         {
             try
             {
-                var ship = await _context.Ships.FirstOrDefaultAsync(s => s.ShipId == shipId);
+                var ship = await _context.Ships
+                    .Select(ship => new ShipWithUsersDto
+                    {
+                        ShipId = ship.Id,
+                        Name = ship.Name,
+                        ShipCode = ship.ShipCode,
+                        Latitude = ship.Latitude,
+                        Longitude = ship.Longitude,
+                        Velocity = ship.Velocity,
+                        Users = ship.UserShips
+                                .Select(su => new UserDto
+                                {
+                                    UserId = su.UserId,
+                                    UserName = su.User.Name,
+                                    Role = su.User.Role
+                                })
+                                .ToList()
+                    })
+                    .Where(w => w.ShipId == getClosestPort.id)
+                    .FirstOrDefaultAsync();
                 if (ship == null)
                 {
-                    _logger.LogWarning($"Ship with ID " + shipId + " was not found.");
-                    return (null, null, "0");
+                    _logger.LogWarning($"Ship with ID " + getClosestPort.id + " was not found.");
+                    return (null);
                 }
 
                 var ports = await _context.Ports.ToListAsync();
                 if (ports == null || ports.Count == 0)
                 {
                     _logger.LogWarning("No ports found.");
-                    return (null, null, "0");
+                    return (null);
                 }
 
                 Port closestPort = null;
@@ -154,16 +354,31 @@ namespace AEBackendCodeChallenge.Services
                 if (closestPort == null)
                 {
                     _logger.LogWarning("No closest port could be determined.");
-                    return (null, null, "0");
+                    return (null);
                 }
-
                 var estimatedArrivalTime = shortestDistance / ship.Velocity;
-                return (ship, closestPort, FormatEstimatedTime(estimatedArrivalTime));
+
+                //Populate return value
+                string strEstimatedArrivalTime = FormatEstimatedTime(estimatedArrivalTime);
+
+                ShipClosestPortInformationDto closestPortDto = new ShipClosestPortInformationDto
+                {
+                    PortInfo = closestPort,
+                    EstimatedArrivalTime = strEstimatedArrivalTime,
+                    EstimatedDistance = Math.Round((decimal)shortestDistance, 2).ToString() + " Nautical Miles"
+                };
+
+
+                ShipClosestPortDto shipClosestPortDto = new ShipClosestPortDto();
+                shipClosestPortDto.shipDetailInfo = ship;
+                shipClosestPortDto.PortInformation = closestPortDto;
+
+                return (shipClosestPortDto);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An error occurred while calculating the closest port for ship ID " + shipId + ".");
-                return (null, null, "0"); // or throw a custom exception
+                _logger.LogError(ex, $"An error occurred while calculating the closest port for ship ID " + getClosestPort.id + ".");
+                return (null); // or throw a custom exception
             }
         }
 

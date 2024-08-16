@@ -1,6 +1,6 @@
 ﻿using AEBackendCodeChallenge.Data;
 using AEBackendCodeChallenge.Models;
-using AEBackendCodeChallenge.Models.Queryable;
+using AEBackendCodeChallenge.Models.Dto;
 using Microsoft.EntityFrameworkCore;
 
 namespace AEBackendCodeChallenge.Services
@@ -45,7 +45,7 @@ namespace AEBackendCodeChallenge.Services
            
         }
 
-        public async Task<Port> UpdatePortAsync(UpdatePortQuery updatedPort)
+        public async Task<Port> UpdatePortAsync(PortDto updatedPort)
         {
             try
             {

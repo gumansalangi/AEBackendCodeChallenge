@@ -8,8 +8,7 @@
         public string Role { get; set; }
 
         // Navigation property
-        [System.Text.Json.Serialization.JsonIgnore]
-        public List<Ship>? Ships { get; set; }
+        public ICollection<UserShip>? UserShips { get; set; } 
     }
 
 }

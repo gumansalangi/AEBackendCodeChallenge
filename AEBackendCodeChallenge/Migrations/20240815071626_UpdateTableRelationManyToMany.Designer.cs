@@ -3,6 +3,7 @@ using AEBackendCodeChallenge.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AEBackendCodeChallenge.Migrations
 {
     [DbContext(typeof(ShipDbContext))]
-    partial class ShipDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240815071626_UpdateTableRelationManyToMany")]
+    partial class UpdateTableRelationManyToMany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,7 +88,7 @@ namespace AEBackendCodeChallenge.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ShipCode")
+                    b.Property<string>("ShipId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -130,7 +133,7 @@ namespace AEBackendCodeChallenge.Migrations
 
                     b.HasIndex("ShipId");
 
-                    b.ToTable("UserShips");
+                    b.ToTable("UserShip");
                 });
 
             modelBuilder.Entity("AEBackendCodeChallenge.Models.UserShip", b =>

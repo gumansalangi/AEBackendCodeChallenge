@@ -1,5 +1,5 @@
 ﻿using AEBackendCodeChallenge.Models;
-using AEBackendCodeChallenge.Models.Queryable;
+using AEBackendCodeChallenge.Models.Dto;
 using AEBackendCodeChallenge.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -61,7 +61,7 @@ namespace AEBackendCodeChallenge.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Port>> UpdatePorts (UpdatePortQuery updatedPort)
+        public async Task<ActionResult<Port>> UpdatePorts (PortDto updatedPort)
         {
             if (updatedPort == null)
                 return BadRequest("Invalid dort data");

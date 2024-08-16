@@ -3,6 +3,7 @@ using AEBackendCodeChallenge.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AEBackendCodeChallenge.Migrations
 {
     [DbContext(typeof(ShipDbContext))]
-    partial class ShipDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240815064410_UpdateTableRelation")]
+    partial class UpdateTableRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,7 +88,7 @@ namespace AEBackendCodeChallenge.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ShipCode")
+                    b.Property<string>("ShipId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -95,6 +98,21 @@ namespace AEBackendCodeChallenge.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Ships");
+                });
+
+            modelBuilder.Entity("AEBackendCodeChallenge.Models.ShipUser", b =>
+                {
+                    b.Property<int>("ShipId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ShipId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ShipUser");
                 });
 
             modelBuilder.Entity("AEBackendCodeChallenge.Models.User", b =>
@@ -118,31 +136,16 @@ namespace AEBackendCodeChallenge.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("AEBackendCodeChallenge.Models.UserShip", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ShipId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "ShipId");
-
-                    b.HasIndex("ShipId");
-
-                    b.ToTable("UserShips");
-                });
-
-            modelBuilder.Entity("AEBackendCodeChallenge.Models.UserShip", b =>
+            modelBuilder.Entity("AEBackendCodeChallenge.Models.ShipUser", b =>
                 {
                     b.HasOne("AEBackendCodeChallenge.Models.Ship", "Ship")
-                        .WithMany("UserShips")
+                        .WithMany("ShipsUsers")
                         .HasForeignKey("ShipId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("AEBackendCodeChallenge.Models.User", "User")
-                        .WithMany("UserShips")
+                        .WithMany("ShipsUsers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -154,12 +157,12 @@ namespace AEBackendCodeChallenge.Migrations
 
             modelBuilder.Entity("AEBackendCodeChallenge.Models.Ship", b =>
                 {
-                    b.Navigation("UserShips");
+                    b.Navigation("ShipsUsers");
                 });
 
             modelBuilder.Entity("AEBackendCodeChallenge.Models.User", b =>
                 {
-                    b.Navigation("UserShips");
+                    b.Navigation("ShipsUsers");
                 });
 #pragma warning restore 612, 618
         }
