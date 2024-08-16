@@ -74,6 +74,8 @@ namespace AEBackendCodeChallenge.Controllers
                     return NotFound($"User with ID " + assignShipToUser.UsersId + " not found or ships could not be updated");
 
                 return Ok(updatedUser);
+
+
             }
             catch (Exception ex)
             {
