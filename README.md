@@ -69,11 +69,12 @@ API Endpoints
         - POST /api/Ships/GetShipBasedOnUserId: Get ship based on user id.
         - POST /api/Ships/UpdateVelocity: Updates the velocity of a ship.
         - POST /api/Ships/GetClosestPort: Calculates and retrieves the closest port to a given ship.
+        - POST /api/Ships/AssignShipToUser: Assign ship to one or more user
  
    - Users Management:
         - GET /api/Users/GetUsers: Retrieves all users.
         - POST /api/Users/CreateUser: Creates a new user.
-        - POST /api/Users/AssignUserToShips: Assigns ships to a user.
+        - POST /api/Users/AssignUserToShips: Assigns ship to one or more user.
  
 
 Validation
