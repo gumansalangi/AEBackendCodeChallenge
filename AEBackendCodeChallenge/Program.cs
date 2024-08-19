@@ -6,6 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Ensure the app listens on port 80 (or another port if needed)
+builder.WebHost.UseUrls("https://0.0.0.0:7279");
+
+
+
 // Add services to the container.
 // Add multiple validator
 builder.Services.AddControllers()

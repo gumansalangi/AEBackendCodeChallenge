@@ -122,4 +122,4 @@ Pre testing steps
    - Make sure the docker already installed on the testing machine
    - Navigate to the Project Directory "..\AEBackendCodeChallenge\AEBackendCodeChallenge":
    - Run the following command to build the Docker image: "docker build -t aebackendcodechallenge ."
-   - Run the Docker Container : "docker run -d -p 8080:80 --name testcontainer aebackendcodechallenge"
+   - Run the Docker Container : "docker run -d -p 7279:80 --name testcontainer aebackendcodechallenge"
