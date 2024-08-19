@@ -3,9 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AEBackendCodeChallenge", "AEBackendCodeChallenge\AEBackendCodeChallenge.csproj", "{2713D4B0-E6A6-4079-B741-06F50619FDEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AEBackendCodeChallenge", "AEBackendCodeChallenge\AEBackendCodeChallenge.csproj", "{2713D4B0-E6A6-4079-B741-06F50619FDEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AEBackendCodeChallenge.Test", "AEBackendCodeChallenge.Test\AEBackendCodeChallenge.Test.csproj", "{788E3E07-5AAA-45BC-BB14-8754A45044C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AEBackendCodeChallenge.Test", "AEBackendCodeChallenge.Test\AEBackendCodeChallenge.Test.csproj", "{788E3E07-5AAA-45BC-BB14-8754A45044C3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{82579D7B-79AC-4732-B4BA-D10FC06F4314}"
+	ProjectSection(SolutionItems) = preProject
+		Testing Script.docx = Testing Script.docx
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
