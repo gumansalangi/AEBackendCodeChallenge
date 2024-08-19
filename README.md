@@ -123,3 +123,7 @@ Pre testing steps
    - Navigate to the Project Directory "..\AEBackendCodeChallenge\AEBackendCodeChallenge":
    - Run the following command to build the Docker image: "docker build -t aebackendcodechallenge ."
    - Run the Docker Container : "docker run -d -p 7279:80 --name testcontainer aebackendcodechallenge"
+  
+Testing
+   Please look in to "Testing Script.docx" for reference
+   
