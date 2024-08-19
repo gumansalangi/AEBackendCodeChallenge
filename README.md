@@ -101,3 +101,25 @@ Dockerization
    - Dockerfile is included to containerize the application.
    - The Docker image uses .NET 8 as the base image.
    - The application is set up to run in a container with a connection string pointing to a local MDF file.
+
+
+Pre testing steps
+1. Get master branch to your local or testing environment
+
+2. Run Database Migrations
+   - Open Command Line or Terminal from visual studio
+   - Navigate to the directory where your .NET Core project is located. "..\AEBackendCodeChallenge\AEBackendCodeChallenge"
+   - Run the Migration Command:
+     - Use the following command to apply the migrations: dotnet ef database update
+     - Ensure that the dotnet-ef tool is installed. If it’s not, you can install it globally using: dotnet tool install --global dotnet-ef
+   - Verify the migration by checking the database for updated schema
+     - From Visual Studio open SQL Server Object Explorer, this can be open y clicking View --> SQL Server Object Explorer
+     - On the SQL Server Object Explorer navigate to SQL Server --> Localdb --> Databases --> ShipDb --> Tables --> Port
+     - If the migration success, on the port table when right click and select show data it will show the port data that has been seed on the code.
+      
+3. Build the Docker Image 
+   - After the database is up-to-date, the next step is to build the Docker image for the application.
+   - Make sure the docker already installed on the testing machine
+   - Navigate to the Project Directory "..\AEBackendCodeChallenge\AEBackendCodeChallenge":
+   - Run the following command to build the Docker image: "docker build -t aebackendcodechallenge ."
+   - Run the Docker Container : "docker run -d -p 8080:80 --name testcontainer aebackendcodechallenge"
