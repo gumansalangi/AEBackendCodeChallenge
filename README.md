@@ -123,7 +123,521 @@ Pre testing steps
    - Navigate to the Project Directory "..\AEBackendCodeChallenge\AEBackendCodeChallenge":
    - Run the following command to build the Docker image: "docker build -t aebackendcodechallenge ."
    - Run the Docker Container : "docker run -d -p 7279:80 --name testcontainer aebackendcodechallenge"
+
+
   
-Testing
-   Please look in to "Testing Script.docx" for reference
-   
+Testing API Endpoints    
+•	Ports Management:
+   - GET /api/Ports/GetAllPorts: Retrieves a list of all ports.
+   - Request JSON
+   - Result JSON
+     [
+       {
+           "name": "Los Angeles Port",
+           "latitude": 34.0522,
+           "longitude": -118.2437
+       },
+       {
+           "name": "New York Port",
+           "latitude": 40.7128,
+           "longitude": -74.006
+       },
+       {
+           "name": "London Port",
+           "latitude": 51.5074,
+           "longitude": -0.1278
+       }
+   ]
+
+•	Ships Management:
+   - GET /api/Ships/GetShips: Retrieves all ships
+   - Request JSON
+   - Result JSON
+   - [
+    {
+        "shipId": 3,
+        "name": "RG Shipping Line",
+        "shipCode": "RGSL001",
+        "latitude": -6.13333,
+        "longitude": 106.9,
+        "velocity": 4,
+        "users": [
+            {
+                "userId": 1,
+                "userName": "Rudolf",
+                "role": "Admin"
+            },
+            {
+                "userId": 2,
+                "userName": "Jhon",
+                "role": "User"
+            },
+            {
+                "userId": 2003,
+                "userName": "Jeremy",
+                "role": "Admin"
+            }
+        ]
+    },
+    {
+        "shipId": 4,
+        "name": "RG Shipping Line 02",
+        "shipCode": "RGSL002",
+        "latitude": 3,
+        "longitude": 101.3999984,
+        "velocity": 5,
+        "users": [
+            {
+                "userId": 2,
+                "userName": "Jhon",
+                "role": "User"
+            }
+        ]
+    },
+    {
+        "shipId": 1003,
+        "name": "RG Shipping Line 02",
+        "shipCode": "RGSL002",
+        "latitude": 3,
+        "longitude": 101.3999984,
+        "velocity": 5,
+        "users": []
+    },
+    {
+        "shipId": 1004,
+        "name": "RG Shipping Line 005",
+        "shipCode": "RGSL005",
+        "latitude": 53.34609,
+        "longitude": -6.20831,
+        "velocity": 3,
+        "users": []
+    },
+    {
+        "shipId": 2003,
+        "name": "RG Shipping Line 007",
+        "shipCode": "RGSL007",
+        "latitude": 56.319832054,
+        "longitude": -133.603997584,
+        "velocity": 3,
+        "users": [
+            {
+                "userId": 1003,
+                "userName": "Sidney",
+                "role": "Admin"
+            },
+            {
+                "userId": 2002,
+                "userName": "Albert",
+                "role": "Admin"
+            }
+        ]
+    },
+    {
+        "shipId": 2004,
+        "name": "RG Shipping Line 008",
+        "shipCode": "RGSL008",
+        "latitude": 56.319832054,
+        "longitude": -133.603997584,
+        "velocity": 10,
+        "users": [
+            {
+                "userId": 2003,
+                "userName": "Jeremy",
+                "role": "Admin"
+            }
+        ]
+    }
+]
+
+
+o	GET /api/Ships/GetUnassingedShips:
+   - Request JSON:
+   - Return JSON:
+   - [
+    {
+        "shipId": 1003,
+        "name": "RG Shipping Line 02",
+        "shipCode": "RGSL002",
+        "latitude": 3,
+        "longitude": 101.3999984,
+        "velocity": 5,
+        "users": []
+    },
+    {
+        "shipId": 1004,
+        "name": "RG Shipping Line 005",
+        "shipCode": "RGSL005",
+        "latitude": 53.34609,
+        "longitude": -6.20831,
+        "velocity": 3,
+        "users": []
+    }
+]
+
+
+o	POST /api/Ships/CreateShip: Creates a new ship.
+   - With users
+   - Request JSON:
+   - {
+  "name": "RG Shipping Line 009",
+  "shipId": "RGSL009",
+  "latitude": 56.319832054,
+  "longitude": -133.603997584,
+  "velocity": 3,
+  "users": [
+    {
+      "userId": 2003,
+      "userName": "Jeremy",
+      "role": "Admin"
+    }
+  ]
+}
+   - Return JSON:
+   - {
+    "shipId": 3003,
+    "name": "RG Shipping Line 009",
+              "shipId": "RGSL009",
+    "shipCode": "RGSL009",
+    "latitude": 56.319832054,
+    "longitude": -133.603997584,
+    "velocity": 3,
+    "users": [
+        {
+            "userId": 2003,
+            "userName": "Jeremy",
+            "role": "Admin"
+        }
+    ]
+}
+
+Without user
+- Request:
+- {
+  "name": "RG Shipping Line 011",
+  "shipId": "RGSL011",
+  "shipCode": "RGSL011",
+  "latitude": 56.319832054,
+  "longitude": -133.603997584,
+  "velocity": 3,
+  "users": []
+}
+- Return:
+- {
+    "shipId": 3004,
+    "name": "RG Shipping Line 011",
+    "shipCode": "RGSL011",
+    "latitude": 56.319832054,
+    "longitude": -133.603997584,
+    "velocity": 3,
+    "users": []
+}
+
+
+o	POST /api/Ships/AssignShipToUser: Assigns a ship to a user.
+- Request JSON
+- {
+  "shipId": 1004,
+  "userIds": [
+   1003
+  ]
+}
+- Return JSON
+- {
+    "shipId": 1004,
+    "name": "RG Shipping Line 005",
+    "shipCode": "RGSL005",
+    "latitude": 53.34609,
+    "longitude": -6.20831,
+    "velocity": 3,
+    "users": [
+        {
+            "userId": 1003,
+            "userName": "Sidney",
+            "role": "Admin"
+        }
+    ]
+}
+
+
+o	POST /api/Ships/GetShipBasedOnUserId: Get ship based on user id.
+- Request: “https://localhost:7279/api/Ships/GetShipsBasedOnUserID?id=1”
+- Return:
+- [
+    {
+        "shipId": 3,
+        "name": "RG Shipping Line",
+        "shipCode": "RGSL001",
+        "latitude": -6.13333,
+        "longitude": 106.9,
+        "velocity": 4,
+        "users": [
+            {
+                "userId": 1,
+                "userName": "Rudolf",
+                "role": "Admin"
+            }
+        ]
+    }
+]
+
+
+
+o	POST /api/Ships/UpdateVelocity: Updates the velocity of a ship.
+- Request:
+- {
+  "shipId": "2004",
+  "velocity": 10
+}
+- Response:
+- {
+    "shipId": 2004,
+    "name": "RG Shipping Line 008",
+    "shipCode": "RGSL008",
+    "latitude": 56.319832054,
+    "longitude": -133.603997584,
+    "velocity": 10,
+    "users": [
+        {
+            "userId": 2003,
+            "userName": "Jeremy",
+            "role": "Admin"
+        }
+    ]
+}
+
+
+
+o	POST /api/Ships/GetClosestPort: Calculates and retrieves the closest port to a given ship.
+- Request:
+- {
+  "id": 2004
+}
+- Return:
+- {
+    "portInformation": {
+        "portInfo": {
+            "name": "London Port",
+            "latitude": 51.5074,
+            "longitude": -0.1278
+        },
+        "estimatedDistance": "1438,34 Nautical Miles",
+        "estimatedArrivalTime": "Estimated Arrival Time 6 days and 0 hours."
+    },
+    "shipDetailInfo": {
+        "shipId": 2004,
+        "name": "RG Shipping Line 008",
+        "shipCode": "RGSL008",
+        "latitude": 56.319832054,
+        "longitude": -133.603997584,
+        "velocity": 10,
+        "users": [
+            {
+                "userId": 2003,
+                "userName": "Jeremy",
+                "role": "Admin"
+            }
+        ]
+    }
+}
+
+
+
+•	Users Management:
+o	GET /api/Users/GetUsers: Retrieves all users.
+- Request:
+- Return:
+- [
+  {
+    "userId": 1,
+    "userName": "Rudolf",
+    "role": "Admin",
+    "ships": [
+      {
+        "shipId": 3,
+        "shipCode": null,
+        "name": "RG Shipping Line",
+        "latitude": -6.13333,
+        "longitude": 106.9,
+        "velocity": 4
+      }
+    ]
+  },
+  {
+    "userId": 2,
+    "userName": "Jhon",
+    "role": "User",
+    "ships": [
+      {
+        "shipId": 3,
+        "shipCode": null,
+        "name": "RG Shipping Line",
+        "latitude": -6.13333,
+        "longitude": 106.9,
+        "velocity": 4
+      },
+      {
+        "shipId": 4,
+        "shipCode": null,
+        "name": "RG Shipping Line 02",
+        "latitude": 3,
+        "longitude": 101.3999984,
+        "velocity": 5
+      }
+    ]
+  },
+  {
+    "userId": 1002,
+    "userName": "Doe",
+    "role": "Admin",
+    "ships": []
+  },
+  {
+    "userId": 1003,
+    "userName": "Sidney",
+    "role": "Admin",
+    "ships": [
+      {
+        "shipId": 2003,
+        "shipCode": null,
+        "name": "RG Shipping Line 007",
+        "latitude": 56.319832054,
+        "longitude": -133.603997584,
+        "velocity": 3
+      }
+    ]
+  },
+  {
+    "userId": 2002,
+    "userName": "Albert",
+    "role": "Admin",
+    "ships": [
+      {
+        "shipId": 2003,
+        "shipCode": null,
+        "name": "RG Shipping Line 007",
+        "latitude": 56.319832054,
+        "longitude": -133.603997584,
+        "velocity": 3
+      }
+    ]
+  },
+  {
+    "userId": 2003,
+    "userName": "Jeremy",
+    "role": "Admin",
+    "ships": [
+      {
+        "shipId": 3,
+        "shipCode": null,
+        "name": "RG Shipping Line",
+        "latitude": -6.13333,
+        "longitude": 106.9,
+        "velocity": 4
+      },
+      {
+        "shipId": 2004,
+        "shipCode": null,
+        "name": "RG Shipping Line 008",
+        "latitude": 56.319832054,
+        "longitude": -133.603997584,
+        "velocity": 10
+      },
+      {
+        "shipId": 3003,
+        "shipCode": null,
+        "name": "RG Shipping Line 009",
+        "latitude": 56.319832054,
+        "longitude": -133.603997584,
+        "velocity": 3
+      }
+    ]
+  }
+]
+
+
+
+o	POST /api/Users/CreateUser: Creates a new user.
+- Request:
+- {
+  "userName": "Bosch",
+  "role": "Admin",
+  "ships": [
+    {
+        "shipId": 3,
+        "name": "RG Shipping Line",
+        "ShipCode": "",
+        "latitude": -6.13333,
+        "longitude": 106.9,
+        "velocity": 3
+    }
+  ]
+}
+- Return
+- {
+    "userId": 3002,
+    "userName": "Bosch",
+    "role": "Admin",
+    "ships": [
+        {
+            "shipId": 3,
+            "shipCode": null,
+            "name": "RG Shipping Line",
+            "latitude": -6.13333,
+            "longitude": 106.9,
+            "velocity": 4
+        }
+    ]
+}
+
+- Create user with no ship
+  - Request:
+  - {
+   "userName": "Tate",
+   "role": "Admin",
+   "ships": []
+}
+   - Return:
+   - {
+    "userId": 3003,
+    "userName": "Tate",
+    "role": "Admin",
+    "ships": []
+}
+
+
+o	POST /api/Users/AssignUserToShips: Assigns ships to a user.
+- Request:
+- {
+  "usersId": 2,
+  "shipIds": [
+    3,4
+  ]
+}
+
+- Return:
+- {
+    "userId": 2,
+    "userName": "Jhon",
+    "role": "User",
+    "ships": [
+        {
+            "shipId": 3,
+            "shipCode": null,
+            "name": "RG Shipping Line",
+            "latitude": -6.13333,
+            "longitude": 106.9,
+            "velocity": 4
+        },
+        {
+            "shipId": 4,
+            "shipCode": null,
+            "name": "RG Shipping Line 02",
+            "latitude": 3,
+            "longitude": 101.3999984,
+            "velocity": 5
+        }
+    ]
+}
+
+
+
