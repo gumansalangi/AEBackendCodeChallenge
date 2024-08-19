@@ -110,8 +110,8 @@ Pre testing steps
    - Open Command Line or Terminal from visual studio
    - Navigate to the directory where your .NET Core project is located. "..\AEBackendCodeChallenge\AEBackendCodeChallenge"
    - Run the Migration Command:
-     - Use the following command to apply the migrations: dotnet ef database update
-     - Ensure that the dotnet-ef tool is installed. If it’s not, you can install it globally using: dotnet tool install --global dotnet-ef
+     - Use the following command to apply the migrations: "dotnet ef database update"
+     - Ensure that the dotnet-ef tool is installed. If it’s not, you can install it globally using: "dotnet tool install --global dotnet-ef"
    - Verify the migration by checking the database for updated schema
      - From Visual Studio open SQL Server Object Explorer, this can be open y clicking View --> SQL Server Object Explorer
      - On the SQL Server Object Explorer navigate to SQL Server --> Localdb --> Databases --> ShipDb --> Tables --> Port
